@@ -33,6 +33,6 @@ pkgs.mkShell {
       fi
     fi
 
-    git add . && git commit -m "init project from richen604/unity-shell"
+    git add . && git commit -m "init project from richen604/godot-shell"
   '';
 }
