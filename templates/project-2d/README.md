@@ -36,8 +36,8 @@ direnv allow
 this template automatically manages large assets through git hooks and dvc:
 
 - **what it does**: scans commits for large files and assets typically git-ignored
-- **why it helps**: keeps all assets version controlled without bloating your repository
-- **how it works**: large assets are tracked by dvc, stored remotely, but remain accessible to your team
+- **why it helps**: keeps all assets version controlled without bloating your repository, skips your need to run dvc commands manually
+- **how it works**: large assets are tracked by dvc, pushed remotely, but remain accessible to your team
 
 when you commit large assets (textures, models, audio), the hooks will:
 
@@ -45,6 +45,15 @@ when you commit large assets (textures, models, audio), the hooks will:
 2. automatically add them to dvc tracking
 3. commit the lightweight dvc pointer files instead
 4. keep your repository fast while maintaining full asset history
+
+youll want to check out the [dvc docs](https://dvc.org/doc) for more information on how to use dvc.
+
+first, you'll want to setup a remote for your project (below is an example):
+
+```bash
+# initialize a remote for your project
+dvc remote add -d myremote https://myremote.com/myrepo
+```
 
 ### 4. start developing
 

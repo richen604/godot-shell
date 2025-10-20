@@ -3,17 +3,12 @@
 ## next
 
 - test a few projects and understand the files it creates, use a simple 2d and 3d template
-- list of recommended addons i should have by default
-  - all
-    - something
-  - 2d
-    - something
-  - 3d
-    - something
+
 - reference chicken game template, code coverage might be cool to steal
+- better asset detection in scripts, use an actual git ignore file
+  - [for images as an example](https://github.com/github/gitignore/blob/main/Global/Images.gitignore)
 
 - self hosted github action runner
-- external assets symlinking scripts
 - revise the project template and addon template
 - addon template should be templated and a script should be made to quickly edit the contents
 
@@ -29,22 +24,18 @@
 
 ## unsure
 
+- automate dvc merge conflict asset comparison (checkout and cp)
 - templating scripts for variables like project name, author, etc.
 
-initial addons?:
+- list of recommended addons i should have by default
+  - all
+    - something
+  - 2d
+    - something
+  - 3d
+    - something
 
-- take a look at the asset library for some free stuff
-- godot-tween or create_tween() (built-in tweening)
-- phantom camera or custom camera controller (for camera management)
-- godot input system (built-in input handling)
-- godot's built-in rich text label and font system
-- audio: simple audio manager for sfx/bgm using AudioStreamPlayer
-- runtime level editor (if applicable)
-- debug utilities (e.g., in-game console)
-- common gdscript templates (node scripts, resource scripts)
-- base scene setup (main camera, light, input handling)
-- common scene components (player, ui elements)
-- ci: godot test framework setup (gut or gdunit4)
+initial addons?:
 
 ai integration:
 
