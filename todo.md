@@ -69,9 +69,6 @@ ai integration:
 
 ## nix - further enhancements
 
-- **fhs environment for godot:**
-  - research and integrate `godot-fhs-env` wrapper
-  - configure `direnv` to automatically pull in the godot editor and environment
 - **gpu acceleration:**
   - verify and document gpu acceleration setup for godot editor under nix
 - **declarative godot editors:**
@@ -81,3 +78,34 @@ ai integration:
 - **documentation:**
   - comprehensive nix setup guide for godot
   - explain how to manage different godot versions with nix
+
+### design docs todo
+
+#### misc notes / unorganized
+
+- anti piracy:
+  - login with steam? [godot has better auth with third party steam support](https://gist.github.com/Whats-A-MattR/5bce5574e568e8d8e6be55cf692df3a1) [godot betterauth plugin](https://godotengine.org/asset-library/asset/4416)
+  - requires putting assets or systems on a server
+
+- addons
+  - ai:
+    - [LimboAI](https://godotengine.org/asset-library/asset/3787) - ai framework
+  - debugging:
+    - [LimboConsole](https://godotengine.org/asset-library/asset/3338) - in-game dev console with useful features
+  - auth
+    - [BetterAuth](https://godotengine.org/asset-library/asset/4416) - steam auth
+  - performance:
+    - [gecs - godot entitiy component system](https://github.com/csprance/gecs/tree/main) - entity component system
+
+- video notes
+  - [composition](https://youtu.be/rCu8vQrdDDI)
+    - make components for each game where generics are useful
+    - examples:
+      - velocity componenet
+      - knockback component
+      - aim component
+      - health component
+      - damage component
+      - pathfinding component
+  - [ecs with godot](https://youtu.be/pkTwRdESsBA?list=TLPQMjAxMDIwMjX2Hm-IkDDUZQ)
+    - ![ecs with godot comparison](./assets/todo_ecs_with_godot.png)

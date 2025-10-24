@@ -74,3 +74,5 @@ TODO
 
 - [godot docs](https://docs.godotengine.org/) - official documentation
 - [godot tutorials](https://docs.godotengine.org/en/stable/getting_started/introduction/index.html) - getting started guide
+- [godot asset library](https://godotengine.org/asset-library/asset) - asset library
+- [godot-demo-projects](https://github.com/godotengine/godot-demo-projects) - offical demo projects, good for inspiration / best practices

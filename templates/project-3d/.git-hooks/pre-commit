@@ -6,10 +6,10 @@
 
 set -e
 
-# Size threshold in bytes (10MB)
-SIZE_THRESHOLD=10485760
+# Configuration
+SIZE_THRESHOLD=${DVC_HOOK_SIZE_THRESHOLD:-10485760}  # 10MB default, configurable via env var
 
-# File types that should be tracked with DVC (from .gitignore)
+# File types that should be tracked with DVC
 DVC_FILE_TYPES=(
     # Images/Textures
     "png" "jpg" "jpeg" "tga" "exr" "hdr" "tiff" "bmp" "psd"
@@ -23,136 +23,133 @@ DVC_FILE_TYPES=(
     "zip" "rar" "7z" "tar.gz"
 )
 
-# Function to check if file extension matches DVC file types
-is_dvc_file_type() {
+# Check if file should be tracked with DVC
+should_track_with_dvc() {
     local file="$1"
-    local ext="${file##*.}"
-    ext="${ext,,}" # Convert to lowercase
+    local file_size="$2"
     
-    # Handle special case for .tar.gz
-    if [[ "$file" == *.tar.gz ]]; then
-        ext="tar.gz"
+    # Check size threshold
+    if [ "$file_size" -gt "$SIZE_THRESHOLD" ]; then
+        return 0
     fi
     
+    # Check file extension
+    local ext="${file##*.}"
+    ext="${ext,,}"  # Convert to lowercase
+    
+    # Handle special case for .tar.gz
+    [[ "$file" == *.tar.gz ]] && ext="tar.gz"
+    
+    # Check against DVC file types
     for dvc_ext in "${DVC_FILE_TYPES[@]}"; do
-        if [[ "$ext" == "$dvc_ext" ]]; then
-            return 0
-        fi
+        [[ "$ext" == "$dvc_ext" ]] && return 0
     done
+    
     return 1
 }
 
-# Get list of files being committed
-staged_files=$(git diff --cached --name-only --diff-filter=ACM)
+# Get file size with error handling
+get_file_size() {
+    stat -c%s "$1" 2>/dev/null || echo 0
+}
 
-if [ -z "$staged_files" ]; then
-    exit 0
-fi
-
-large_files=()
-
-# Check each staged file
-while IFS= read -r file; do
-    if [ -f "$file" ]; then
-        file_size=$(stat -c%s "$file" 2>/dev/null || echo 0)
-        
-        # Check if file should be tracked with DVC (either large or specific file type)
-        should_track_with_dvc=false
-        
-        # Check if file is large
-        if [ "$file_size" -gt "$SIZE_THRESHOLD" ]; then
-            should_track_with_dvc=true
-        fi
-        
-        # Check if file type should be tracked with DVC
-        if is_dvc_file_type "$file"; then
-            should_track_with_dvc=true
-        fi
-        
-        # If file should be tracked with DVC but doesn't have a .dvc file
-        if [ "$should_track_with_dvc" = true ] && [ ! -f "${file}.dvc" ]; then
-            large_files+=("$file")
-        fi
-    fi
-done <<< "$staged_files"
-
-# If no large files found, proceed with commit
-if [ ${#large_files[@]} -eq 0 ]; then
-    exit 0
-fi
-
-# Display files that need DVC tracking
-echo "⚠️  Found files that should be tracked with DVC:"
-project_root=$(git rev-parse --show-toplevel)
-current_dir=$(pwd)
-for file in "${large_files[@]}"; do
-    # Get relative path from project root
-    if [[ "$file" == /* ]]; then
-        # Absolute path - make it relative to project root
-        relative_path="${file#$project_root/}"
+# Format file size for display
+format_size() {
+    local size="$1"
+    if [ "$size" -gt "$SIZE_THRESHOLD" ]; then
+        echo "($(( size / 1048576 ))MB - large file)"
     else
-        # Already relative path - ensure it's from project root
-        if [[ "$current_dir" != "$project_root" ]]; then
-            relative_path="${current_dir#$project_root/}/$file"
-        else
-            relative_path="$file"
-        fi
+        echo "(binary asset type)"
     fi
+}
+
+# Add files to DVC tracking
+add_files_to_dvc() {
+    local files=("$@")
     
-    file_size=$(stat -c%s "$file" 2>/dev/null || echo 0)
-    if [ "$file_size" -gt "$SIZE_THRESHOLD" ]; then
-        size_mb=$((file_size / 1048576))
-        echo "  - $relative_path (${size_mb}MB - large file)"
-    elif is_dvc_file_type "$file"; then
-        echo "  - $relative_path (binary asset type)"
-    fi
-done
-echo
+    echo "📦 Adding files to DVC..."
+    for file in "${files[@]}"; do
+        echo "  Processing: $file"
+        
+        # Remove from Git staging
+        git rm --cached "$file" >/dev/null 2>&1 || git reset HEAD "$file" >/dev/null 2>&1 || true
+        
+        # Add to DVC
+        if dvc add "$file"; then
+            # Stage DVC file and any gitignore changes
+            git add "${file}.dvc" .gitignore "$(dirname "$file")/.gitignore" 2>/dev/null || true
+        else
+            echo "  ⚠️  Failed to add $file to DVC"
+            return 1
+        fi
+    done
+    
+    echo "✅ Files added to DVC. Proceeding with commit."
+    return 0
+}
 
-# Use gum to prompt user
-if command -v gum >/dev/null 2>&1; then
-    if gum confirm "Add these files to DVC tracking?"; then
-        echo "📦 Adding files to DVC..."
-        for file in "${large_files[@]}"; do
-            echo "  Removing from Git staging: $file"
-            git reset HEAD "$file" >/dev/null 2>&1
-            echo "  Adding to DVC: $file"
-            dvc add "$file"
-            git add "${file}.dvc" 2>/dev/null || true
-            # Add .gitignore if it was created
-            if [ -f ".gitignore" ]; then
-                git add .gitignore 2>/dev/null || true
-            fi
-        done
-        echo "✅ Files added to DVC. Proceeding with commit."
-        exit 0
+# Prompt user for DVC addition
+prompt_user() {
+    local files=("$@")
+    
+    if command -v gum >/dev/null 2>&1; then
+        gum confirm "Add these files to DVC tracking?"
     else
-        echo "❌ Commit blocked. Files that should be tracked with DVC found."
-        echo "   Run 'dvc add <file>' for each file, then commit again."
-        exit 1
+        read -p "Add these files to DVC tracking? (y/N): " -n 1 -r
+        echo
+        [[ $REPLY =~ ^[Yy]$ ]]
     fi
-else
-    # Fallback if gum is not available
-    read -p "Add these files to DVC tracking? (y/N): " -n 1 -r
+}
+
+# Main execution
+main() {
+    # Get staged files
+    local staged_files
+    staged_files=$(git diff --cached --name-only --diff-filter=ACM)
+    
+    [ -z "$staged_files" ] && exit 0
+    
+    local files_needing_dvc=()
+    
+    # Check each staged file
+    while IFS= read -r file; do
+        [ -f "$file" ] || continue
+        
+        local file_size
+        file_size=$(get_file_size "$file")
+        
+        # Check if should be tracked with DVC and isn't already
+        if should_track_with_dvc "$file" "$file_size" && [ ! -f "${file}.dvc" ]; then
+            files_needing_dvc+=("$file")
+        fi
+    done <<< "$staged_files"
+    
+    # Exit if no files need DVC tracking
+    [ ${#files_needing_dvc[@]} -eq 0 ] && exit 0
+    
+    # Display files that need DVC tracking
+    echo "⚠️  Found files that should be tracked with DVC:"
+    for file in "${files_needing_dvc[@]}"; do
+        local file_size
+        file_size=$(get_file_size "$file")
+        echo "  - $file $(format_size "$file_size")"
+    done
     echo
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
-        echo "📦 Adding files to DVC..."
-        for file in "${large_files[@]}"; do
-            echo "  Removing from Git staging: $file"
-            git reset HEAD "$file" >/dev/null 2>&1
-            echo "  Adding to DVC: $file"
-            dvc add "$file"
-            git add "${file}.dvc" 2>/dev/null || true
-            # Add .gitignore if it was created
-            if [ -f ".gitignore" ]; then
-                git add .gitignore 2>/dev/null || true
-            fi
-        done
-        echo "✅ Files added to DVC. Proceeding with commit."
-        exit 0
+    
+    # Prompt user and handle response
+    if prompt_user "${files_needing_dvc[@]}"; then
+        if add_files_to_dvc "${files_needing_dvc[@]}"; then
+            exit 0
+        else
+            echo "❌ Failed to add some files to DVC. Commit blocked."
+            exit 1
+        fi
     else
         echo "❌ Commit blocked. Files that should be tracked with DVC found."
         echo "   Run 'dvc add <file>' for each file, then commit again."
         exit 1
     fi
-fi
+}
+
+# Run main function
+main "$@"
