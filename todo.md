@@ -2,21 +2,48 @@
 
 ## next
 
+
+- remove the 2d temporarily
+- review and condense the other component documentation from llm slop
+- add godot exports to the shell?
 - test a few projects and understand the files it creates, use a simple 2d and 3d template
 
-- reference chicken game template, code coverage might be cool to steal
-- better asset detection in scripts, use an actual git ignore file
-  - [for images as an example](https://github.com/github/gitignore/blob/main/Global/Images.gitignore)
+[components](./docs/components/components.md)
+
+- healthcomponent - health and damage system
+- velocitycomponent - movement calculations
+- movementcomponent - apply movement to entities
+- audiocomponent - sound effects
+- timercomponent - time-based mechanics
+
+- hurtboxcomponent - damage detection
+- hitboxcomponent - damage dealing
+- weaponcomponent - combat mechanics
+- interactablecomponent - world interaction
+- followcomponent - basic ai
+
+- jumpcomponent - platformer mechanics
+- dashcomponent - advanced movement
+- pathfindcomponent - ai navigation
+- detectioncomponent - ai awareness
+- healthbarcomponent - visual feedback
 
 - self hosted github action runner
-- revise the project template and addon template
-- addon template should be templated and a script should be made to quickly edit the contents
 
 ## backlog
 
-- hello world impl for addon and importing guide
+- better asset detection in scripts for the pre-commit hook, use an actual git ignore file + any other file extension or mimetype. maybe mimetypes are better?
+  - [for images as an example](https://github.com/github/gitignore/blob/main/Global/Images.gitignore)
 - setup commitlint, semantic-release, git hooks, and github actions for these
-  - for both project and addon, some scripting might help
+- reference chicken game template, code coverage might be cool to steal
+- addon template
+  - create one after ive made my own and understand the standard
+  - hello world impl for addon and importing guide
+  - addon template should be templated and a script should be made to quickly edit the contents
+  - templating scripts for variables like project name, author, etc.
+- dvc
+  - review the other hooks and confirm they work
+  - make the commit hook not use gum
 
 ### lower priority
 
@@ -25,7 +52,6 @@
 ## unsure
 
 - automate dvc merge conflict asset comparison (checkout and cp)
-- templating scripts for variables like project name, author, etc.
 
 - list of recommended addons i should have by default
   - all
