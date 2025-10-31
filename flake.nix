@@ -6,8 +6,28 @@
   };
 
   outputs =
-    { ... }@inputs:
+    { self, nixpkgs, ... }@inputs:
+    let
+      systems = [
+        "x86_64-linux"
+        "aarch64-linux"
+        "x86_64-darwin"
+        "aarch64-darwin"
+      ];
+      forAllSystems = f: nixpkgs.lib.genAttrs systems (system: f system);
+    in
     {
+      packages = forAllSystems (
+        system:
+        let
+          pkgs = import nixpkgs {
+            inherit system;
+          };
+        in
+        {
+          godotenv = pkgs.callPackage ./pkgs/godotenv.nix { };
+        }
+      );
 
       templates = {
         default = {
