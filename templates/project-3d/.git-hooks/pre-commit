@@ -68,22 +68,67 @@ add_files_to_dvc() {
     local files=("$@")
     
     echo "📦 Adding files to DVC..."
+    
+    # First, unstage all files from Git
     for file in "${files[@]}"; do
-        echo "  Processing: $file"
-        
-        # Remove from Git staging
-        git rm --cached "$file" >/dev/null 2>&1 || git reset HEAD "$file" >/dev/null 2>&1 || true
-        
-        # Add to DVC
-        if dvc add "$file"; then
-            # Stage DVC file and any gitignore changes
-            git add "${file}.dvc" .gitignore "$(dirname "$file")/.gitignore" 2>/dev/null || true
+        # Remove from Git staging - handle both tracked and newly added files
+        if git ls-files --cached "$file" >/dev/null 2>&1; then
+            # File is already tracked by Git
+            git rm --cached "$file" >/dev/null 2>&1 || true
         else
-            echo "  ⚠️  Failed to add $file to DVC"
-            return 1
+            # File is newly added (staged but not committed)
+            git restore --staged "$file" >/dev/null 2>&1 || git reset "$file" >/dev/null 2>&1 || true
         fi
     done
     
+    # Try to add all files at once for maximum efficiency
+    echo "  Attempting to batch add all ${#files[@]} files to DVC..."
+    if dvc add "${files[@]}" 2>/dev/null; then
+        echo "  ✅ Successfully batch added all ${#files[@]} files to DVC in one operation"
+    else
+        echo "  ⚠️ Global batch add failed, falling back to directory-based batching..."
+        
+        # Group files by directory for more efficient DVC operations
+        declare -A dir_files
+        for file in "${files[@]}"; do
+            local dir=$(dirname "$file")
+            if [[ -z "${dir_files[$dir]}" ]]; then
+                dir_files[$dir]="$file"
+            else
+                dir_files[$dir]="${dir_files[$dir]} $file"
+            fi
+        done
+        
+        # Try to add all files in a directory at once for efficiency
+        for dir in "${!dir_files[@]}"; do
+            local files_in_dir=(${dir_files[$dir]})
+            local our_files_count=${#files_in_dir[@]}
+            
+            echo "    Processing directory: $dir ($our_files_count files)"
+            
+            # For directories with multiple files, try batch processing
+            if [[ $our_files_count -gt 3 ]]; then
+                echo "      Attempting batch DVC add for directory..."
+                # Try to add all files in the directory with a single command
+                if dvc add "${files_in_dir[@]}" 2>/dev/null; then
+                    echo "      ✓ Batch added $our_files_count files to DVC"
+                    continue
+                else
+                    echo "      ⚠️ Batch add failed, falling back to individual files"
+                fi
+            fi
+            
+            # Add files individually in this directory
+            for file in "${files_in_dir[@]}"; do
+                if ! dvc add "$file"; then
+                    echo "    ⚠️  Failed to add $file to DVC"
+                    return 1
+                fi
+            done
+        done
+    fi
+    
+    # Auto-staging is enabled, so DVC files are automatically staged
     echo "✅ Files added to DVC. Proceeding with commit."
     return 0
 }

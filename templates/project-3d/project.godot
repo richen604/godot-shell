@@ -9,14 +9,17 @@ config/name="Godot 3D Project"
 config/description="A performance-optimized 3D project template for rapid prototyping and game jams"
 config/version="1.0.0"
 run/main_scene="res://scenes/Main.tscn"
-config/features=PackedStringArray("4.3", "Forward Plus")
+config/features=PackedStringArray("4.5", "Forward Plus")
 config/icon="res://icon.svg"
 
 [audio]
 
-driver/driver="PulseAudio"
 driver/mix_rate=44100
 driver/output_latency=15
+buses/default_bus_layout="res://default_bus_layout.tres"
+driver/enable_input=true
+general/2d_panning_strength=0.5
+general/3d_panning_strength=1.0
 
 [debug]
 
@@ -24,20 +27,37 @@ settings/stdout/print_fps=false
 settings/stdout/verbose_stdout=false
 settings/crash_handler/message="Please submit a bug report with steps to reproduce the issue."
 
+[debug]
+gdscript/warnings/untyped_declaration=1
+gdscript/warnings/unsafe_property_access=1
+gdscript/warnings/unsafe_method_access=1
+gdscript/warnings/unsafe_cast=1
+file_logging/enable_file_logging=true
+
 [display]
 
 window/size/viewport_width=1920
 window/size/viewport_height=1080
 window/size/mode=2
 window/size/resizable=true
-window/stretch/mode="canvas_items"
+window/stretch/mode="viewport"
 window/stretch/aspect="expand"
 window/vsync/vsync_mode=1
+window/size/always_on_top=false
+window/size/transparent=false
+window/size/borderless=false
+window/energy_saving/keep_screen_on=true
+window/dpi/allow_hidpi=true
 
 [filesystem]
 
-import/blender/enabled=false
-import/fbx/enabled=false
+import/blender/enabled=true
+import/fbx/enabled=true
+import/fbx2gltf/enabled=true
+
+[input_devices]
+pointing/emulate_touch_from_mouse=true
+pointing/emulate_mouse_from_touch=true
 
 [input]
 
@@ -110,26 +130,49 @@ pause={
 
 common/max_physics_steps_per_frame=8
 common/physics_jitter_fix=0.5
+common/physics_ticks_per_second=60
+common/enable_object_picking=true
 3d/default_gravity=9.8
 3d/default_linear_damp=0.1
 3d/default_angular_damp=0.1
+3d/physics_engine="DEFAULT"
+3d/solver/contact_max_allowed_penetration=0.01
 
 [rendering]
 
 renderer/rendering_method="forward_plus"
 renderer/rendering_method.mobile="mobile"
 textures/canvas_textures/default_texture_filter=2
-anti_aliasing/quality/msaa_3d=1
+anti_aliasing/quality/msaa_3d=3
 anti_aliasing/quality/screen_space_aa=1
 anti_aliasing/quality/use_taa=false
+anti_aliasing/quality/use_debanding=true
 occlusion_culling/use_occlusion_culling=true
 occlusion_culling/bvh_build_quality=2
-mesh_lod/lod_change/threshold_pixels=1.0
+mesh_lod/lod_change/threshold_pixels=2.0
 global_illumination/gi/use_half_resolution=true
-reflections/sky_reflections/texture_array_reflections=false
+reflections/sky_reflections/texture_array_reflections=true
 reflections/sky_reflections/ggx_samples=32
-lights_and_shadows/directional_shadow/size=2048
-lights_and_shadows/directional_shadow/soft_shadow_filter_quality=2
+reflections/sky_reflections/roughness_layers=8
+lights_and_shadows/directional_shadow/size=4096
+lights_and_shadows/directional_shadow/soft_shadow_filter_quality=3
 lights_and_shadows/positional_shadow/soft_shadow_filter_quality=2
+lights_and_shadows/positional_shadow/atlas_size=4096
+environment/ssao/enabled=true
+environment/ssil/enabled=false
+environment/glow/enabled=false
+driver/threads/thread_model=2
+limits/time/time_rollover_secs=3600
 2d/snap/snap_2d_transforms_to_pixel=false
 2d/snap/snap_2d_vertices_to_pixel=false
+textures/default_filters/use_nearest_mipmap_filter=false
+textures/default_filters/anisotropic_filtering_level=4
+textures/vram_compression/import_etc2_astc=true
+textures/lossless_compression/force_png=false
+
+[compression]
+formats/zstd/compression_level=3
+formats/zlib/compression_level=6
+
+[memory]
+limits/message_queue/max_size_mb=32
