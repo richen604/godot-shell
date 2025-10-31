@@ -12,11 +12,15 @@
       templates = {
         default = {
           path = ./templates/project-3d;
-          description = "A basic Godot project";
+          description = "A basic godot 3d project";
         };
         project-3d = {
           path = ./templates/project-3d;
-          description = "A basic Godot 3d project";
+          description = "A basic godot 3d project";
+        };
+        addon = {
+          path = ./templates/addon;
+          description = "A basic godot addon";
         };
       };
     };

@@ -1,0 +1,105 @@
+# DVC ignore file for Godot gamedev projects
+# Files and directories listed here will be ignored by DVC
+# Use this to keep certain files in Git instead of DVC
+
+# Godot Configuration Files (keep in Git)
+*.tscn
+*.tres
+*.godot
+*.cfg
+*.remap
+*.import
+
+# Code Files (keep in Git)
+*.gd
+*.cs
+*.js
+*.ts
+*.py
+*.cpp
+*.h
+*.hpp
+*.c
+*.cc
+*.cxx
+*.hlsl
+*.glsl
+
+# Text Configuration Files (keep in Git)
+*.json
+*.yml
+*.yaml
+*.txt
+*.md
+*.cfg
+*.ini
+*.conf
+
+# Godot Project Files (keep in Git)
+project.godot
+export_presets.cfg
+
+# Build and Cache Directories (ignore completely)
+.godot/
+.import/
+Build/
+Builds/
+Logs/
+.vs/
+.vscode/
+.idea/
+
+# Godot Generated Files (ignore completely)
+*.log
+*.tmp
+*.temp
+mono_crash.*
+*.translation
+
+# Platform Specific Build Outputs (ignore completely)
+*.apk
+*.aab
+*.app
+*.exe
+*.x86_64
+*.x86
+
+# Version Control (ignore completely)
+.git/
+.svn/
+.hg/
+
+# Environment Files (ignore completely)
+.env
+.envrc
+.direnv/
+
+# OS Generated Files (ignore completely)
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# IDE Files (ignore completely)
+*.csproj
+*.sln
+*.suo
+*.user
+*.userprefs
+*.pidb
+*.booproj
+
+# Package Manager Files (ignore completely)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.direnv
+
+# Mono-specific (ignore completely)
+.mono/
+data_*/

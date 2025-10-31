@@ -1,0 +1,200 @@
+#!/usr/bin/env bash
+# Pre-commit hook to check for large files and binary assets without DVC tracking
+# Prompts user to add files to DVC before committing based on:
+# - File size (>10MB)
+# - File types specified in .gitignore (images, audio, models, video, etc.)
+
+set -e
+
+# Configuration
+SIZE_THRESHOLD=${DVC_HOOK_SIZE_THRESHOLD:-10485760}  # 10MB default, configurable via env var
+
+# File types that should be tracked with DVC
+DVC_FILE_TYPES=(
+    # Images/Textures
+    "png" "jpg" "jpeg" "tga" "exr" "hdr" "tiff" "bmp" "psd"
+    # Audio
+    "wav" "mp3" "ogg" "aiff" "flac"
+    # 3D Models
+    "fbx" "obj" "blend" "max" "ma" "mb"
+    # Video
+    "mp4" "mov" "avi" "mkv" "webm"
+    # Other large binaries
+    "zip" "rar" "7z" "tar.gz"
+)
+
+# Check if file should be tracked with DVC
+should_track_with_dvc() {
+    local file="$1"
+    local file_size="$2"
+    
+    # Check size threshold
+    if [ "$file_size" -gt "$SIZE_THRESHOLD" ]; then
+        return 0
+    fi
+    
+    # Check file extension
+    local ext="${file##*.}"
+    ext="${ext,,}"  # Convert to lowercase
+    
+    # Handle special case for .tar.gz
+    [[ "$file" == *.tar.gz ]] && ext="tar.gz"
+    
+    # Check against DVC file types
+    for dvc_ext in "${DVC_FILE_TYPES[@]}"; do
+        [[ "$ext" == "$dvc_ext" ]] && return 0
+    done
+    
+    return 1
+}
+
+# Get file size with error handling
+get_file_size() {
+    stat -c%s "$1" 2>/dev/null || echo 0
+}
+
+# Format file size for display
+format_size() {
+    local size="$1"
+    if [ "$size" -gt "$SIZE_THRESHOLD" ]; then
+        echo "($(( size / 1048576 ))MB - large file)"
+    else
+        echo "(binary asset type)"
+    fi
+}
+
+# Add files to DVC tracking
+add_files_to_dvc() {
+    local files=("$@")
+    
+    echo "📦 Adding files to DVC..."
+    
+    # First, unstage all files from Git
+    for file in "${files[@]}"; do
+        # Remove from Git staging - handle both tracked and newly added files
+        if git ls-files --cached "$file" >/dev/null 2>&1; then
+            # File is already tracked by Git
+            git rm --cached "$file" >/dev/null 2>&1 || true
+        else
+            # File is newly added (staged but not committed)
+            git restore --staged "$file" >/dev/null 2>&1 || git reset "$file" >/dev/null 2>&1 || true
+        fi
+    done
+    
+    # Try to add all files at once for maximum efficiency
+    echo "  Attempting to batch add all ${#files[@]} files to DVC..."
+    if dvc add "${files[@]}" 2>/dev/null; then
+        echo "  ✅ Successfully batch added all ${#files[@]} files to DVC in one operation"
+    else
+        echo "  ⚠️ Global batch add failed, falling back to directory-based batching..."
+        
+        # Group files by directory for more efficient DVC operations
+        declare -A dir_files
+        for file in "${files[@]}"; do
+            local dir=$(dirname "$file")
+            if [[ -z "${dir_files[$dir]}" ]]; then
+                dir_files[$dir]="$file"
+            else
+                dir_files[$dir]="${dir_files[$dir]} $file"
+            fi
+        done
+        
+        # Try to add all files in a directory at once for efficiency
+        for dir in "${!dir_files[@]}"; do
+            local files_in_dir=(${dir_files[$dir]})
+            local our_files_count=${#files_in_dir[@]}
+            
+            echo "    Processing directory: $dir ($our_files_count files)"
+            
+            # For directories with multiple files, try batch processing
+            if [[ $our_files_count -gt 3 ]]; then
+                echo "      Attempting batch DVC add for directory..."
+                # Try to add all files in the directory with a single command
+                if dvc add "${files_in_dir[@]}" 2>/dev/null; then
+                    echo "      ✓ Batch added $our_files_count files to DVC"
+                    continue
+                else
+                    echo "      ⚠️ Batch add failed, falling back to individual files"
+                fi
+            fi
+            
+            # Add files individually in this directory
+            for file in "${files_in_dir[@]}"; do
+                if ! dvc add "$file"; then
+                    echo "    ⚠️  Failed to add $file to DVC"
+                    return 1
+                fi
+            done
+        done
+    fi
+    
+    # Auto-staging is enabled, so DVC files are automatically staged
+    echo "✅ Files added to DVC. Proceeding with commit."
+    return 0
+}
+
+# Prompt user for DVC addition
+prompt_user() {
+    local files=("$@")
+    
+    if command -v gum >/dev/null 2>&1; then
+        gum confirm "Add these files to DVC tracking?"
+    else
+        read -p "Add these files to DVC tracking? (y/N): " -n 1 -r
+        echo
+        [[ $REPLY =~ ^[Yy]$ ]]
+    fi
+}
+
+# Main execution
+main() {
+    # Get staged files
+    local staged_files
+    staged_files=$(git diff --cached --name-only --diff-filter=ACM)
+    
+    [ -z "$staged_files" ] && exit 0
+    
+    local files_needing_dvc=()
+    
+    # Check each staged file
+    while IFS= read -r file; do
+        [ -f "$file" ] || continue
+        
+        local file_size
+        file_size=$(get_file_size "$file")
+        
+        # Check if should be tracked with DVC and isn't already
+        if should_track_with_dvc "$file" "$file_size" && [ ! -f "${file}.dvc" ]; then
+            files_needing_dvc+=("$file")
+        fi
+    done <<< "$staged_files"
+    
+    # Exit if no files need DVC tracking
+    [ ${#files_needing_dvc[@]} -eq 0 ] && exit 0
+    
+    # Display files that need DVC tracking
+    echo "⚠️  Found files that should be tracked with DVC:"
+    for file in "${files_needing_dvc[@]}"; do
+        local file_size
+        file_size=$(get_file_size "$file")
+        echo "  - $file $(format_size "$file_size")"
+    done
+    echo
+    
+    # Prompt user and handle response
+    if prompt_user "${files_needing_dvc[@]}"; then
+        if add_files_to_dvc "${files_needing_dvc[@]}"; then
+            exit 0
+        else
+            echo "❌ Failed to add some files to DVC. Commit blocked."
+            exit 1
+        fi
+    else
+        echo "❌ Commit blocked. Files that should be tracked with DVC found."
+        echo "   Run 'dvc add <file>' for each file, then commit again."
+        exit 1
+    fi
+}
+
+# Run main function
+main "$@"
