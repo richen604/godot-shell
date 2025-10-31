@@ -2,8 +2,6 @@
 
 ## next
 
-
-- remove the 2d temporarily
 - review and condense the other component documentation from llm slop
 - add godot exports to the shell?
 - test a few projects and understand the files it creates, use a simple 2d and 3d template
@@ -32,15 +30,16 @@
 
 ## backlog
 
+- docs to prune
+  - components/examples/
+  - components/advanced/
+  - components/component-patterns.md - somewhat ok
+  - components/getting-started.md - redundant
+  - design.md - self written, misc notes
 - better asset detection in scripts for the pre-commit hook, use an actual git ignore file + any other file extension or mimetype. maybe mimetypes are better?
   - [for images as an example](https://github.com/github/gitignore/blob/main/Global/Images.gitignore)
 - setup commitlint, semantic-release, git hooks, and github actions for these
 - reference chicken game template, code coverage might be cool to steal
-- addon template
-  - create one after ive made my own and understand the standard
-  - hello world impl for addon and importing guide
-  - addon template should be templated and a script should be made to quickly edit the contents
-  - templating scripts for variables like project name, author, etc.
 - dvc
   - review the other hooks and confirm they work
   - make the commit hook not use gum
@@ -54,12 +53,7 @@
 - automate dvc merge conflict asset comparison (checkout and cp)
 
 - list of recommended addons i should have by default
-  - all
-    - something
-  - 2d
-    - something
-  - 3d
-    - something
+  - something
 
 initial addons?:
 
