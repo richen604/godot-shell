@@ -67,7 +67,10 @@
           if [ ! -d .dvc ]; then
             dvc init
 
-            dfc config add -d local ./.dvc-storage
+            dvc remote add -d local ./.dvc-storage
+
+            git add . 2>/dev/null || true
+            git commit -m "init dvc" 2>/dev/null || true
           fi
         '';
       };

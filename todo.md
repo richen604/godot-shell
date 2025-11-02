@@ -2,13 +2,12 @@
 
 ## next
 
-- add godot exports to the shell
-
 - test matugen module with new ssh keys
 - move dev to cedar
 
-- first addon: simple 3d character
-- first addon: simple 3d level for prototyping
+- templates: gdunit for both addons and project3d
+
+- first addon: 3d prototype scene
 
 ## backlog
 
@@ -32,16 +31,16 @@
     ./ ./_dist/
   ```
 
-  just need to add rsync as dep and some sort of justfile/make to tarball it
+  just need to add rsync as dep and some sort of nix script run and to tarball it
 
 - better asset detection in scripts for the pre-commit hook, use an actual git ignore file + any other file extension or mimetype. maybe mimetypes are better?
   - [for images as an example](https://github.com/github/gitignore/blob/main/Global/Images.gitignore)
 
 [components](./docs/components/components.md)
 
-- healthcomponent - health and damage system
 - velocitycomponent - movement calculations
 - movementcomponent - apply movement to entities
+- healthcomponent - health and damage system
 - audiocomponent - sound effects
 - timercomponent - time-based mechanics
 - hurtboxcomponent - damage detection
