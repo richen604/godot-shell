@@ -7,7 +7,7 @@
 
 buildDotnetModule rec {
   pname = "godotenv";
-  version = "2.15.1";
+  version = "2.16.0";
 
   src = fetchFromGitHub {
     owner = "chickensoft-games";
@@ -31,7 +31,7 @@ buildDotnetModule rec {
     description = "Manage Godot versions and addons from the command line on Windows, macOS, and Linux.";
     homepage = "https://github.com/chickensoft-games/GodotEnv";
     license = licenses.mit;
-    maintainers = [ ];
+    maintainers = [ richen604 ];
     platforms = platforms.all;
   };
 }

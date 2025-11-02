@@ -2,9 +2,44 @@
 
 ## next
 
-- review and condense the other component documentation from llm slop
-- add godot exports to the shell?
-- test a few projects and understand the files it creates, use a simple 2d and 3d template
+- update gotdotenv to 2.16 in shell, just copy from godotenv repo
+- setup godotenv for addons
+- add godot exports to the shell
+- default dvc server config, add to readme to revise
+
+- test matugen module with new ssh keys
+- move dev to cedar
+- 
+
+- first addon: simple 3d character
+- first addon: simple 3d level for prototyping
+
+## backlog
+
+- github actions
+  - commitlint
+  - semantic-release
+  - code coverage
+  - unit tests
+  - self hosted runner:
+    - cross platform build
+    - release  
+- dvc remove gum from precommit hook and shell
+- how to package dvc assets for addons?
+  you can package in place with something like:
+
+  ```bash
+  dvc pull
+  rsync -av \
+    --exclude '.git*' \
+    --exclude '.dvc*' \
+    ./ ./_dist/
+  ```
+
+  just need to add rsync as dep and some sort of justfile/make to tarball it
+
+- better asset detection in scripts for the pre-commit hook, use an actual git ignore file + any other file extension or mimetype. maybe mimetypes are better?
+  - [for images as an example](https://github.com/github/gitignore/blob/main/Global/Images.gitignore)
 
 [components](./docs/components/components.md)
 
@@ -13,22 +48,16 @@
 - movementcomponent - apply movement to entities
 - audiocomponent - sound effects
 - timercomponent - time-based mechanics
-
 - hurtboxcomponent - damage detection
 - hitboxcomponent - damage dealing
 - weaponcomponent - combat mechanics
 - interactablecomponent - world interaction
 - followcomponent - basic ai
-
 - jumpcomponent - platformer mechanics
 - dashcomponent - advanced movement
 - pathfindcomponent - ai navigation
 - detectioncomponent - ai awareness
 - healthbarcomponent - visual feedback
-
-- self hosted github action runner
-
-## backlog
 
 - docs to prune
   - components/examples/
@@ -36,13 +65,6 @@
   - components/component-patterns.md - somewhat ok
   - components/getting-started.md - redundant
   - design.md - self written, misc notes
-- better asset detection in scripts for the pre-commit hook, use an actual git ignore file + any other file extension or mimetype. maybe mimetypes are better?
-  - [for images as an example](https://github.com/github/gitignore/blob/main/Global/Images.gitignore)
-- setup commitlint, semantic-release, git hooks, and github actions for these
-- reference chicken game template, code coverage might be cool to steal
-- dvc
-  - review the other hooks and confirm they work
-  - make the commit hook not use gum
 
 ### lower priority
 
