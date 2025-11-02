@@ -24,6 +24,7 @@
           dvc-with-remotes
           gum
           godot
+          godotPackages.export-template
         ];
 
         shellHook = ''
