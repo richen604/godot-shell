@@ -31,6 +31,11 @@ pkgs.mkShell {
           rm -rf .git-hooks
         fi
         
+        # append "addons/" to .gitignore if not already present
+        if ! grep -qx 'addons/' .gitignore 2>/dev/null; then
+          echo "addons/" >> .gitignore
+        fi
+        
         # only commit if there are staged changes and no existing commits
         if git diff --cached --quiet 2>/dev/null || ! git rev-parse --verify HEAD >/dev/null 2>&1; then
           git add . 2>/dev/null || true

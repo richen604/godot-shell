@@ -32,7 +32,6 @@ mono_crash.*.json
 
 # Environment Files
 .env
-.direnv/
 
 # OS Generated Files
 .DS_Store
@@ -53,3 +52,12 @@ Desktop.ini
 *.userprefs
 *.pidb
 *.booproj
+
+# nix stuff
+result
+.direnv/
+
+# godotenv
+.addons/*
+addons/*
+!addons/.editorconfig

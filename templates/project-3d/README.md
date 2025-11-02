@@ -4,55 +4,44 @@ a streamlined 3d project template with automated asset management for rapid prot
 
 ## what you get
 
-- standardized godot project structure
-- automated large asset handling via dvc and git hooks
-- nix development environment for consistent tooling
-- open source alternative to perforce/git lfs workflows
+- [dvc](https://dvc.org/) for asset version control
+  - automated with git hooks
+- [nix](https://nixos.org/) for reproducible development environments
+  - with [direnv](https://direnv.net/) for automatic environment setup
+- [godotenv](https://github.com/chickensoft-games/GodotEnv) for managing godot addons
 
 ## getting started
 
-### 1. setup your environment
+### dvc - asset version control
 
-ensure you have these installed:
+`godot-shell` uses [dvc](https://dvc.org/) for asset version control, automated with git hooks
+see `./.git/hooks/pre-commit` for implementation
 
-- nix (with flakes support recommended)
-- direnv
+what it does:
 
-### 2. initialize the project
+- detects files over the size threshold
+- automatically adds them to dvc tracking
+- commits the lightweight dvc pointer files instead
+- keeps your repository fast while maintaining full asset history
+- all of this is done automatically with git hooks
 
-```bash
-# copy this template to your project directory
-mkdir your-game-name
-nix flake init -t github:richen604/godot-shell/#project-3d
+by default the dvc remote is set locally to `./.dvc-storage`
+you probably want to update this to the remote of your choice in `.dvc/config` [see docs](https://dvc.org/doc/user-guide/data-management/remote-storage#remote-storage)
 
-# allow direnv to setup the development environment
-direnv allow
+### godotenv - godot addons management
 
-# shell will automatically initialize git and dvc with hooks
-```
+`godot-shell` uses [godotenv](https://github.com/chickensoft-games/GodotEnv) for managing godot addons
 
-### 3. understand asset management
+what it does:
 
-this template automatically manages large assets through git hooks and dvc:
+- downloads and installs addons from git repositories
+- centralizes addon configuration in `addons.jsonc`
+- can support a global addons directory for space efficiency
+  
+see `./addons.jsonc` for configuration, see [godotenv docs](https://github.com/chickensoft-games/GodotEnv) for more info
 
-- **what it does**: scans commits for large files and assets typically git-ignored
-- **why it helps**: keeps all assets version controlled without bloating your repository
-- **how it works**: large assets are tracked by dvc, stored remotely, but remain accessible to your team
-
-when you commit large assets (textures, models, audio), the hooks will:
-
-1. detect files over the size threshold
-2. automatically add them to dvc tracking
-3. commit the lightweight dvc pointer files instead
-4. keep your repository fast while maintaining full asset history
-
-### 4. start developing
-
-your godot project is ready to go. open godot and point it to this directory to begin development.
-
-## project structure
-
-TODO
+you probably want to update the `path` and `cache` fields in `./addons.jsonc` to the path of your choice
+`addons/` and `./.addons` are the defaults and are automatically added to `.gitignore` for you
 
 ## helpful resources
 

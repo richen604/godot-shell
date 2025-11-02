@@ -2,14 +2,10 @@
 
 ## next
 
-- update gotdotenv to 2.16 in shell, just copy from godotenv repo
-- setup godotenv for addons
 - add godot exports to the shell
-- default dvc server config, add to readme to revise
 
 - test matugen module with new ssh keys
 - move dev to cedar
-- 
 
 - first addon: simple 3d character
 - first addon: simple 3d level for prototyping

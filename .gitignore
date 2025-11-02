@@ -2,3 +2,6 @@
 .direnv/
 .dvc
 result
+addons/*
+!addons/.editorconfig
+.addons/*
