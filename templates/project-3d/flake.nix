@@ -46,7 +46,7 @@
                 # remove the original hooks dir
                 rm -rf .git-hooks
               fi
-              
+
               # append "addons/" to .gitignore if not already present
               if ! grep -qx 'addons/' .gitignore 2>/dev/null; then
                 echo "addons/" >> .gitignore
@@ -65,6 +65,8 @@
           # init dvc
           if [ ! -d .dvc ]; then
             dvc init
+
+            dfc config add -d local ./.dvc-storage
           fi
         '';
       };
