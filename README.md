@@ -1,6 +1,8 @@
 # godot-shell
 
-a collection of opinionated godot project templates with automated asset management and nix development environments.
+everything a solo game developer needs in one environment.
+
+beyond code - design docs, project management, art, sound, marketing, and deployment tools for production-ready games.
 
 ## templates overview
 

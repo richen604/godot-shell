@@ -2,6 +2,8 @@
 
 ## next
 
+- move scripts to a ./nix/shell dir
+
 - test matugen module with new ssh keys
 - move dev to cedar
 
@@ -60,6 +62,11 @@
   - components/component-patterns.md - somewhat ok
   - components/getting-started.md - redundant
   - design.md - self written, misc notes
+
+- art shell
+- sound shell
+- marketing shell
+- project management shell
 
 ### lower priority
 
@@ -145,4 +152,3 @@ ai integration:
       - damage component
       - pathfinding component
   - [ecs with godot](https://youtu.be/pkTwRdESsBA?list=TLPQMjAxMDIwMjX2Hm-IkDDUZQ)
-    - ![ecs with godot comparison](./assets/todo_ecs_with_godot.png)
