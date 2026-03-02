@@ -21,8 +21,11 @@
       devShells."x86_64-linux".default = pkgs.mkShell {
         packages = with pkgs; [
           git
-          dvc-with-remotes
+          dvc
+          # todo: dvc-with-remotes bails for python doc error in nixpkgs
+          #dvc-with-remotes
           gum
+          # todo: review having it run from shell i believe theres a driver issue
           godot
           godotPackages.export-template
         ];
@@ -67,7 +70,7 @@
           if [ ! -d .dvc ]; then
             dvc init
 
-            dvc remote add -d local ./.dvc-storage
+            dvc remote add -d local ./.dvc-store
 
             git add . 2>/dev/null || true
             git commit -m "init dvc" 2>/dev/null || true

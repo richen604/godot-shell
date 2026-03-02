@@ -25,8 +25,12 @@ what it does:
 - keeps your repository fast while maintaining full asset history
 - all of this is done automatically with git hooks
 
-by default the dvc remote is set locally to `./.dvc-storage`
+by default the dvc remote is set locally to `./.dvc-store`
 you probably want to update this to the remote of your choice in `.dvc/config` [see docs](https://dvc.org/doc/user-guide/data-management/remote-storage#remote-storage)
+
+#### known issues
+
+- `git commit -am` will not work if your staging includes files that will be caught by the precommit, add and commit separately
 
 ### godotenv - godot addons management
 
