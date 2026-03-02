@@ -5,3 +5,5 @@ result
 addons/*
 !addons/.editorconfig
 .addons/*
+todo.md
+docs
