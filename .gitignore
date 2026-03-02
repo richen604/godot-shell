@@ -6,4 +6,4 @@ addons/*
 !addons/.editorconfig
 .addons/*
 todo.md
-docs
+docs/
