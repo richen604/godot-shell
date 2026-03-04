@@ -6,15 +6,12 @@ beyond code - design docs, project management, art, sound, marketing, and deploy
 
 ## templates overview
 
-- [project-3d](./templates/project-3d/README.md) - 3d project template
-- [addon](./templates/addon/README.md) - godot addon template
+- [project](./templates/project/README.md) - generic project template
 
 ## quick start
 
 ```bash
-nix flake init -t github:richen604/godot-shell/#project-3d
-# or
-nix flake init -t github:richen604/godot-shell/#addon
+nix flake init -t github:richen604/godot-shell/#project
 
 # setup environment
 direnv allow
@@ -22,7 +19,7 @@ direnv allow
 
 ## what you get
 
-- [dvc](https://dvc.org/) for asset version control
+- [git-lfs](https://git-lfs.com/) for asset version control
   - automated with git hooks
 - [nix](https://nixos.org/) for reproducible development environments
   - with [direnv](https://direnv.net/) for automatic environment setup
