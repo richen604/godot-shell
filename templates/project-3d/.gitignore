@@ -61,6 +61,3 @@ result
 .addons/*
 addons/*
 !addons/.editorconfig
-
-#dvc
-.dvc-store

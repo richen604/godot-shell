@@ -4,33 +4,11 @@ a streamlined 3d project template with automated asset management for rapid prot
 
 ## what you get
 
-- [dvc](https://dvc.org/) for asset version control
+- [git-lfs](https://git-lfs.com/) for asset version control
   - automated with git hooks
 - [nix](https://nixos.org/) for reproducible development environments
   - with [direnv](https://direnv.net/) for automatic environment setup
-- [godotenv](https://github.com/chickensoft-games/GodotEnv) for managing godot addons
-
-## getting started
-
-### dvc - asset version control
-
-`godot-shell` uses [dvc](https://dvc.org/) for asset version control, automated with git hooks
-see `./.git/hooks/pre-commit` for implementation
-
-what it does:
-
-- detects files over the size threshold
-- automatically adds them to dvc tracking
-- commits the lightweight dvc pointer files instead
-- keeps your repository fast while maintaining full asset history
-- all of this is done automatically with git hooks
-
-by default the dvc remote is set locally to `./.dvc-store`
-you probably want to update this to the remote of your choice in `.dvc/config` [see docs](https://dvc.org/doc/user-guide/data-management/remote-storage#remote-storage)
-
-#### known issues
-
-- `git commit -am` will not work if your staging includes files that will be caught by the precommit, add and commit separately
+- [godotenv](https://github.com/chickensoft-games/GodotEnv) for managing and creating godot addons
 
 ### godotenv - godot addons management
 
