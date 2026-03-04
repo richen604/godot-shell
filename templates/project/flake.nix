@@ -3,6 +3,7 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    godot-shell.url = "github:richen604/godot-shell";
   };
 
   outputs =
@@ -23,6 +24,7 @@
           git-lfs
           godot
           godotPackages.export-template
+          godot-shell.packages.${pkgs.system}.godotenv
         ];
 
         shellHook = ''

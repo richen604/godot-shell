@@ -12,7 +12,7 @@ a streamlined 3d project template with automated asset management for rapid prot
 
 ### godotenv - godot addons management
 
-`godot-shell` uses [godotenv](https://github.com/chickensoft-games/GodotEnv) for managing godot addons
+[godotenv](https://github.com/chickensoft-games/GodotEnv) for managing godot addons
 
 what it does:
 
