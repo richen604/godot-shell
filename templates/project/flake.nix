@@ -8,17 +8,16 @@
 
   outputs =
     {
-      self,
-      nixpkgs,
-    }:
+      ...
+    }@inputs:
     let
-      pkgs = import nixpkgs {
+      pkgs = import inputs.nixpkgs {
         system = "x86_64-linux";
         config.allowUnfree = true;
       };
     in
     {
-      devShells."x86_64-linux".default = pkgs.mkShell {
+      devShells."x86_64-linux".default = pkgs.mkShellNoCC {
         packages = with pkgs; [
           git
           git-lfs
@@ -33,7 +32,7 @@
             git lfs install
             git add .gitattributes && git commit -m "chore: init git lfs"
             touch project.godot
-            git commit -am "chore: init godot-shell project"
+            git add . && git commit -m "chore: init godot-shell project"
 
             echo "🎉 godot-shell template initialized"
             echo "to start godot, run:"

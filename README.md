@@ -33,7 +33,3 @@ direnv allow
 ## contributing
 
 feel free to submit issues and pull requests to improve the templates or add new ones.
-
-## todo
-
-see [todo.md](todo.md) for a list of planned features and improvements.

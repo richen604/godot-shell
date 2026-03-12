@@ -2,7 +2,7 @@
   pkgs ? import <nixpkgs> { },
 }:
 
-pkgs.mkShell {
+pkgs.mkShellNoCC {
   packages = with pkgs; [
     git
     git-lfs
