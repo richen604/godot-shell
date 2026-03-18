@@ -13,7 +13,7 @@ buildDotnetModule rec {
     owner = "chickensoft-games";
     repo = "GodotEnv";
     rev = "v${version}";
-    hash = "sha256-dWy+BtZkdPPnHZg/tknDyxjKaM0Smv1J4vTywxn9Gq0=";
+    hash = "sha256-6ptL0Tue5H49UXVktxj6tK81qQgeUwPWBZCfijG0mPA=";
   };
 
   projectFile = "GodotEnv/Chickensoft.GodotEnv.csproj";
