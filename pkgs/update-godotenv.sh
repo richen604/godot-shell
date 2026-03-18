@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 # Updater script for godotenv
-# Usage: ./update-godotenv.sh [--dry-run] [--no-deps]
+# Usage: ./update-godotenv.sh [--dry-run] [--no-deps] [--force-deps]
+#
+# Recommended: Use nix build .#godotenv.fetch-deps && ./result pkgs/deps.json
+# to regenerate deps.json with the correct dependencies.
 
 set -euo pipefail
 
@@ -67,10 +70,20 @@ ARCHIVE_PATH="$TEMP_DIR/archive.tar.gz"
 curl -sSL "$ARCHIVE_URL" -o "$ARCHIVE_PATH"
 
 # Compute SHA256 in nix format (sha256-...)
-# sha256sum outputs hex, but Nix needs base64 - convert hex to base64
+# The hash computed locally may differ from what Nix expects due to archive differences.
+# We'll use a placeholder and let Nix tell us the correct hash if there's a mismatch.
+# For now, compute using the nix-hash command if available, otherwise use base64 conversion.
 HEX_HASH=$(sha256sum "$ARCHIVE_PATH" | cut -d' ' -f1)
 # Convert hex to base64 using perl
 NEW_HASH="sha256-$(perl -MMIME::Base64 -e 'print encode_base64(pack("H*", $ARGV[0]))' "$HEX_HASH" | tr -d '\n')"
+
+# If nix-hash is available, use it to get the correct hash for the fetched archive
+if command -v nix-hash &> /dev/null; then
+    ALT_HASH=$(nix-hash --type sha256 --base64 "$ARCHIVE_PATH")
+    if [[ -n "$ALT_HASH" ]]; then
+        NEW_HASH="sha256-$ALT_HASH"
+    fi
+fi
 
 rm -rf "$TEMP_DIR"
 
